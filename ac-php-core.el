@@ -1178,9 +1178,21 @@ Non-nil SILENT will supress extra status info in the minibuffer."
      )))
 
 
+(defun ac-php--remake-tags (project-root-dir do-all-flag )
+  (let ()
+    (if (not ac-php-gen-tags-flag  )
+        (progn 
+          (setq ac-php-gen-tags-flag  t )
+          ( ac-php--remake-tags-ex  project-root-dir  do-all-flag )
+          )
+      (progn
+        (message "remake: doing ... " )
+        nil
+        )
+      )))
 
 ;;for auto check file
-(defun ac-php--remake-tags (project-root-dir do-all-flag )
+(defun ac-php--remake-tags-ex (project-root-dir do-all-flag )
   "DOCSTRING cache1-files: last edit files:  cache2-files: others"
   (let (  save-tags-dir all-file-list  last-phpctags-errmsg update-tag-file-list  )
 
@@ -1270,11 +1282,10 @@ Non-nil SILENT will supress extra status info in the minibuffer."
             (setq file-last-time  (ac-php--get-timestamp  (nth 5 file-attr) ))
             (setq now  (ac-php--get-timestamp (current-time)  ))
             ;;; check time , and delete tags file if  time out
-            (if  (and  (> (- now  file-last-time )  ac-php-auto-update-intval  )
-                       (not ac-php-gen-tags-flag  )
+            (when  (and  (> (- now  file-last-time )  ac-php-auto-update-intval  )
                        )
-                ( ac-php--remake-tags  project-root-dir  nil )
-                )
+              ( ac-php--remake-tags  project-root-dir  nil )
+              )
             )
 
           (list  project-root-dir tags-file )
@@ -2080,7 +2091,7 @@ Set this variable to nil to disable the lighter."
 
 (defun ac-php-mode-line-project-status ()
   "Report status of current project index."
-  (format ":%02d%%%%%%%%" ac-php-phptags-index-progress   )
+  (format ":%02d%%%%" ac-php-phptags-index-progress   )
     )
 
 
@@ -2091,10 +2102,10 @@ Set this variable to nil to disable the lighter."
   :group 'ac-php
   (cond (ac-php-mode
          ;; Enable ac-php-mode
-         (setq ac-php-gen-tags-flag 1 )
+         (setq ac-php-gen-tags-flag t )
          )
         (t
-         (setq ac-php-gen-tags-flag 0 )
+         (setq ac-php-gen-tags-flag nil )
          ;; Disable ac-php-mode
          ;; Disable semantic
          )))
